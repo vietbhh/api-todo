@@ -34,7 +34,6 @@ class CreateUser extends Migration
 			],
 			'status' => [
 				'type' => 'TINYINT'
-
 			]
 		]);
 		$this->forge->addKey('id', true);
