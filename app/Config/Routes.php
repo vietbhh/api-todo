@@ -30,7 +30,16 @@ $routes->set404Override();
 // We get a performance increase by specifying the default
 // route since we don't have to scan directories.
 $routes->get('/', 'Home::index');
-$routes->get('/test', 'Todo::list');
+
+$routes->group('api', static function ($routes) {
+	$routes->group('todos', static function ($routes) {
+		$routes->get('', 'Todo::list');
+		$routes->post('create', 'Todo::create');
+		$routes->put('update/(:num)', 'Todo::update/$1');
+		$routes->get('delete/(:num)', 'Todo::delete/$1');
+		$routes->get('update-status/(:num)', 'Todo::updateStatus/$1');
+	});
+});
 
 /*
  * --------------------------------------------------------------------
