@@ -32,7 +32,7 @@ $routes->set404Override();
 $routes->get('/', 'Home::index');
 
 $routes->group('api', static function ($routes) {
-	$routes->group('todos', static function ($routes) {
+	$routes->group('todos', ['filter' => 'auth'], static function ($routes) {
 		$routes->get('', 'Todo::list');
 		$routes->post('create', 'Todo::create');
 		$routes->put('update/(:num)', 'Todo::update/$1');

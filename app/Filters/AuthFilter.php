@@ -49,6 +49,7 @@ class AuthFilter implements FilterInterface
 		try {
 			// $decoded = JWT::decode($token, $key, array("HS256"));
 			$decoded = JWT::decode($token, new Key($key, 'HS256'));
+			$request->setHeader('email', $decoded->email);
 		} catch (\Exception $ex) {
 			$response = service('response');
 			$response->setBody('Access denied');

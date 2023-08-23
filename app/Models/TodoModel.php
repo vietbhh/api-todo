@@ -14,7 +14,7 @@ class TodoModel extends Model
     protected $returnType     = 'array';
     //protected $useSoftDeletes = true;
 
-    protected $allowedFields = ['title', 'content', 'created_at', 'updated_at', 'status'];
+    protected $allowedFields = ['title', 'content', 'created_at', 'updated_at', 'status', 'user_id'];
 
     // Dates
     protected $useTimestamps = false;

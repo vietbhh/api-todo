@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Models\UserModel;
 use CodeIgniter\HTTP\ResponseInterface;
 use Services\TodoService;
 use CodeIgniter\HTTP\Response;
@@ -13,14 +14,13 @@ class Todo extends BaseController
 	public function __construct()
 	{
 		$this->model = model('TodoModel');
-		header('Access-Control-Allow-Origin: *');
-		header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept");
-		header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
 	}
 
 	public function list(): \CodeIgniter\HTTP\ResponseInterface
 	{
-		$todos = $this->model->findAll();
+		$userModel = new UserModel();
+		$userId = $userModel->where('email', $this->request->getHeaderLine('email'))->first()['id'];
+		$todos = $this->model->where('user_id', $userId)->findAll();
 
 		return $this->response->setStatusCode(200)->setJSON($todos);
 	}
@@ -32,16 +32,16 @@ class Todo extends BaseController
 //			'status' => 'required'
 		];
 
-
+		$userModel = new UserModel();
+		$userId = $userModel->where('email', $this->request->getHeaderLine('email'))->first()['id'];
 		if (!$this->validate($rules)) {
 			return $this->response->setStatusCode(ResponseInterface::HTTP_UNPROCESSABLE_ENTITY)->setJSON(['status' => 'validate field']);
 		}
 
 		$request = request();
 		$data = $request->getPost();
-
+		$data['user_id'] = $userId;
 		$newIdTodo = $this->model->insert($data);
-
 
 		if (!$newIdTodo) {
 			return $this->response->setStatusCode(ResponseInterface::HTTP_BAD_REQUEST)->setJSON(['status' => 'failed']);

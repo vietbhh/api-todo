@@ -13,9 +13,6 @@ class Auth extends BaseController
 	public function __construct()
 	{
 		$this->model = model('UserModel');
-		header('Access-Control-Allow-Origin: *');
-		header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept");
-		header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
 	}
 
 	public function register(): \CodeIgniter\HTTP\ResponseInterface
@@ -64,7 +61,7 @@ class Auth extends BaseController
 
 		$secretKey = getenv('JWT_SECRET');
 		$now = time();
-		$exp = $now + 60;
+		$exp = $now + 60 * 60;
 
 		$payload = [
 			'time_start' => $now,
@@ -76,6 +73,5 @@ class Auth extends BaseController
 		$token = JWT::encode($payload, $secretKey, 'HS256');
 
 		return $this->response->setStatusCode(ResponseInterface::HTTP_OK)->setJSON(['message' => 'Login successful', 'token' => $token]);
-
 	}
 }
