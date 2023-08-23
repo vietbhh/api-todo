@@ -39,6 +39,9 @@ $routes->group('api', static function ($routes) {
 		$routes->get('delete/(:num)', 'Todo::delete/$1');
 		$routes->get('update-status/(:num)', 'Todo::updateStatus/$1');
 	});
+
+	$routes->post('register', 'Auth::register');
+	$routes->post('login', 'Auth::login');
 });
 
 /*
