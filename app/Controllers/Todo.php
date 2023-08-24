@@ -2,98 +2,86 @@
 
 namespace App\Controllers;
 
-use App\Models\UserModel;
+use CodeIgniter\API\ResponseTrait;
 use CodeIgniter\HTTP\ResponseInterface;
-use Services\TodoService;
-use CodeIgniter\HTTP\Response;
+use App\Services\TodoService;
 
 class Todo extends BaseController
 {
-	protected $model;
+	use ResponseTrait;
+
+	protected TodoService $service;
+	protected array $rules = [
+		'content' => 'required|min_length[5]',
+	];
 
 	public function __construct()
 	{
-		$this->model = model('TodoModel');
+		$this->service = new TodoService();
 	}
 
 	public function list(): \CodeIgniter\HTTP\ResponseInterface
 	{
-		$userModel = new UserModel();
-		$userId = $userModel->where('email', $this->request->getHeaderLine('email'))->first()['id'];
-		$todos = $this->model->where('user_id', $userId)->findAll();
+		$email = $this->request->getHeaderLine('email');
+		$list = $this->service->list($email);
 
-		return $this->response->setStatusCode(200)->setJSON($todos);
+		return $this->respond($list);
 	}
 
 	public function create(): ResponseInterface
 	{
-		$rules = [
-			'content' => 'required|min_length[5]',
-//			'status' => 'required'
-		];
-
-		$userModel = new UserModel();
-		$userId = $userModel->where('email', $this->request->getHeaderLine('email'))->first()['id'];
-		if (!$this->validate($rules)) {
-			return $this->response->setStatusCode(ResponseInterface::HTTP_UNPROCESSABLE_ENTITY)->setJSON(['status' => 'validate field']);
+		if (!$this->validate($this->rules)) {
+			return $this->failValidationErrors($this->validator->getErrors());
 		}
 
-		$request = request();
-		$data = $request->getPost();
-		$data['user_id'] = $userId;
-		$newIdTodo = $this->model->insert($data);
+		$email = $this->request->getHeaderLine('email');
+		$data = $this->request->getPost();
 
-		if (!$newIdTodo) {
-			return $this->response->setStatusCode(ResponseInterface::HTTP_BAD_REQUEST)->setJSON(['status' => 'failed']);
+		$newTodo = $this->service->create($email, $data);
+
+		if (!$newTodo) {
+			return $this->fail('failed');
 		}
 
-		return $this->response->setStatusCode(ResponseInterface::HTTP_CREATED)->setJSON($this->model->find($newIdTodo));
+		return $this->respondCreated($newTodo);
 	}
 
 	public function update($id): ResponseInterface
 	{
-		$rules = [
-			'content' => 'required|min_length[5]',
-//			'status' => 'required'
-		];
-
-		if (!$this->validate($rules)) {
-			return $this->response->setStatusCode(ResponseInterface::HTTP_UNPROCESSABLE_ENTITY)->setJSON(['status' => 'validate field']);
+		if (!$this->validate($this->rules)) {
+			return $this->failValidationErrors($this->validator->getErrors());
 		}
 
-		$updated = $this->model->update($id, $this->request->getJSON());
+		$updated = $this->service->update($id, $this->request->getJSON());
 
 		if (!$updated) {
-			return $this->response->setStatusCode(ResponseInterface::HTTP_BAD_REQUEST)->setJSON(['status' => 'failed']);
+			return $this->fail('failed');
 		}
 
-		return $this->response->setStatusCode(ResponseInterface::HTTP_OK)->setJSON(['status' => 'failed']);
+		return $this->respondUpdated('updated');
 	}
 
 	public function delete($id): ResponseInterface
 	{
-		$isDeleted = $this->model->delete($id);
+		$isDeleted = $this->service->delete($id);
 
 		if (!$isDeleted) {
-			return $this->response->setStatusCode(ResponseInterface::HTTP_NOT_FOUND)->setJSON(['status' => 'failed']);
+			return $this->fail('failed');
 		}
 
-		return $this->response->setStatusCode(ResponseInterface::HTTP_OK)->setJSON(['status' => 'success']);
+		return $this->respondDeleted('deleted');
 	}
 
 	public function updateStatus($id): ResponseInterface
 	{
-		$status = $this->model->find($id)['status'];
-
-		$updated = $this->model->update($id, [
-			'status' => (int)$status === TODO_WORK ? TODO_DONE : TODO_WORK
-		]);
+		$updated = $this->service->updateStatus($id);
 
 		if (!$updated) {
-			return $this->response->setStatusCode(ResponseInterface::HTTP_NOT_FOUND)->setJSON(['status' => 'failed']);
+			return $this->fail('failed');
 		}
 
-		return $this->response->setStatusCode(ResponseInterface::HTTP_OK)->setJSON(['status' => 'success']);
+		return $this->respondUpdated('updated');
+
 	}
 
 }
