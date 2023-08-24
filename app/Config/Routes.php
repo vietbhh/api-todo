@@ -32,13 +32,16 @@ $routes->set404Override();
 $routes->get('/', 'Home::index');
 
 $routes->group('api', static function ($routes) {
-	$routes->group('todos', static function ($routes) {
+	$routes->group('todos', ['filter' => 'auth'], static function ($routes) {
 		$routes->get('', 'Todo::list');
 		$routes->post('create', 'Todo::create');
 		$routes->put('update/(:num)', 'Todo::update/$1');
 		$routes->get('delete/(:num)', 'Todo::delete/$1');
 		$routes->get('update-status/(:num)', 'Todo::updateStatus/$1');
 	});
+
+	$routes->post('register', 'Auth::register');
+	$routes->post('login', 'Auth::login');
 });
 
 /*
