@@ -30,13 +30,13 @@
 # DATABASE
 #--------------------------------------------------------------------
 
-# database.default.hostname = localhost
-# database.default.database = todo
-# database.default.username = root
-# database.default.password = ''
-# database.default.DBDriver = mysql
-# database.default.DBPrefix =
-# database.default.port = 3306
+database.default.hostname = localhost
+database.default.database = todo
+database.default.username = root
+database.default.password = ''
+database.default.DBDriver = MYSQLI
+database.default.DBPrefix =
+database.default.port = 3306
 
 # database.tests.hostname = localhost
 # database.tests.database = todo
@@ -141,3 +141,5 @@
 #--------------------------------------------------------------------
 
 # curlrequest.shareOptions = true
+CI_ENVIRONMENT = development
+JWT_SECRET = 'viet hoang bui 99'

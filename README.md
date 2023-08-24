@@ -25,8 +25,9 @@ to your `app` folder. The affected files can be copied or merged from
 
 ## Setup
 
-Copy `env` to `.env` and tailor for your app, specifically the baseURL
-and any database settings.
+1. Run composer install
+2. Copy env to .env and **change DB information**
+3. php spark serve
 
 ## Important Change with index.php
 
