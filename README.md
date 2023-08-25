@@ -27,7 +27,8 @@ to your `app` folder. The affected files can be copied or merged from
 
 1. Run composer install
 2. Copy env to .env and **change DB information**
-3. php spark serve
+3. php spark migrate
+4. php spark serve
 
 ## Important Change with index.php
 
